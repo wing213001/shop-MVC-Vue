@@ -32,19 +32,29 @@ function getJobList2() { //客戶的購物車
 	return $rows;
 }
 
-function addJob($jobName,$jobContent,$price,$buyNum,$jobID) {
+function addJob($jobName,$jobContent,$price,$buyNum,$jobID,$totalQuantity) {
 	global $db;
 	if($jobID>0) {
-		$sql = "update shop set jobName=?, jobContent=?, price=?, buyNum=? where id=?"; //SQL中的 ? 代表未來要用變數綁定進去的地方
+		$sql = "update shop set jobName=?, jobContent=?, price=?, buyNum=?, totalQuantity=? where id=?"; //SQL中的 ? 代表未來要用變數綁定進去的地方
 		$stmt = mysqli_prepare($db, $sql); //prepare sql statement
-		mysqli_stmt_bind_param($stmt, "ssiii", $jobName, $jobContent,$price,$buyNum,$jobID); //bind parameters with variables, with types "sss":string, string ,string
+		mysqli_stmt_bind_param($stmt, "ssiiii", $jobName, $jobContent,$price,$buyNum,$totalQuantity,$jobID); //bind parameters with variables, with types "sss":string, string ,string
 	} else {
-		$sql = "insert into shop (jobName, jobContent, price) values (?, ?, ?)"; //SQL中的 ? 代表未來要用變數綁定進去的地方
+		$sql = "insert into shop (jobName, jobContent, price, totalQuantity) values (?, ?, ?, ?)"; //SQL中的 ? 代表未來要用變數綁定進去的地方
 		$stmt = mysqli_prepare($db, $sql); //prepare sql statement
-		mysqli_stmt_bind_param($stmt, "ssi", $jobName, $jobContent,$price); //bind parameters with variables, with types "sss":string, string ,string
+		mysqli_stmt_bind_param($stmt, "ssii", $jobName, $jobContent,$price,$totalQuantity); //bind parameters with variables, with types "sss":string, string ,string
 	}
 	mysqli_stmt_execute($stmt);  //執行SQL
 	return True;
+}
+
+function addJob2($buyNum,$jobID) {
+	global $db;
+		$sql = "update shop set buyNum=? where id=?"; //SQL中的 ? 代表未來要用變數綁定進去的地方
+		$stmt = mysqli_prepare($db, $sql); //prepare sql statement
+		mysqli_stmt_bind_param($stmt, "ii",$buyNum,$jobID); //bind parameters with variables, with types "sss":string, string ,string
+	    mysqli_stmt_execute($stmt);  //執行SQL
+        return True;
+
 }
 
 function updateJob($id, $jobName,$jobContent,$price) {

@@ -16,7 +16,14 @@ case "addJob":
 	$jsonStr = $_POST['dat'];
 	$job = json_decode($jsonStr);
 	//should verify first
-	addJob($job->jobName,$job->jobContent,$job->price,$job->buyNum,$job->id);
+	addJob($job->jobName,$job->jobContent,$job->price,$job->buyNum,$job->id,$job->totalQuantity);
+	return;
+case "addJob2":
+	
+	$jsonStr = $_POST['dat'];
+	$job = json_decode($jsonStr);
+	//should verify first
+	addJob2($job->buyNum,$job->id);
 	return;
 case "delJob":
 	$id=(int)$_REQUEST['id']; //$_GET, $_REQUEST

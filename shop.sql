@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- 主機： 127.0.0.1
--- 產生時間： 2023-11-13 15:00:47
+-- 產生時間： 2023-11-14 16:18:41
 -- 伺服器版本： 10.4.21-MariaDB
 -- PHP 版本： 8.0.11
 
@@ -31,23 +31,22 @@ CREATE TABLE `shop` (
   `id` int(11) NOT NULL,
   `jobName` varchar(10) COLLATE utf8_unicode_ci NOT NULL,
   `jobContent` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
-  `status` tinyint(1) NOT NULL,
   `price` int(11) NOT NULL,
   `buyNum` int(11) NOT NULL,
-  `result` int(11) NOT NULL
+  `result` int(11) NOT NULL,
+  `totalQuantity` int(11) NOT NULL,
+  `quantity` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 --
 -- 傾印資料表的資料 `shop`
 --
 
-INSERT INTO `shop` (`id`, `jobName`, `jobContent`, `status`, `price`, `buyNum`, `result`) VALUES
-(1, 'f2f2f3f', '2f22ff', 1, 200, 0, 0),
-(2, 'f3f3f', '33f3f3f', 1, 100, 0, 0),
-(10, 'fwfew', 'dsfwffw', 0, 20, 10, 200),
-(13, 'gwwgwg', 'reggrged', 0, 40, 50, 2000),
-(15, 'fdfsf', 'wefewf', 0, 50, 0, 0),
-(16, 'fewfw', 'fwfwef', 0, 30, 0, 0);
+INSERT INTO `shop` (`id`, `jobName`, `jobContent`, `price`, `buyNum`, `result`, `totalQuantity`, `quantity`) VALUES
+(1, 'f2f2f3f', '2f22ff', 200, 50, 10000, 500, 18),
+(2, 'f3f3f', '33f3f3f', 100, 30, 3000, 30, 10),
+(15, 'fdfsf', 'wefewf', 50, 0, 0, 50, 10),
+(16, 'fewfw', 'fwfwef', 30, 0, 0, 70, 30);
 
 --
 -- 已傾印資料表的索引
@@ -67,7 +66,7 @@ ALTER TABLE `shop`
 -- 使用資料表自動遞增(AUTO_INCREMENT) `shop`
 --
 ALTER TABLE `shop`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=20;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

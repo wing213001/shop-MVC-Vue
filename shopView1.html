@@ -10,12 +10,14 @@
 	<h1>商家頁面</h1>
 	<button @click="setAddUI()">新增商品</button>
 	<table border=1>
-		<tr><td>序號</td><td>商品名稱</td><td>商品說明</td><td>商品單價</td><td>-</td></tr>
+		<tr><td>序號</td><td>商品名稱</td><td>商品說明</td><td>商品單價</td><td>總庫存</td><td>剩餘數量</td><td>-</td></tr>
 		<tr v-for="job in dat">
 			<td>{{job.id}}</td>
 			<td>{{job.jobName}}</td>
 			<td>{{job.jobContent}}</td>
 			<td>{{job.price}}</td>
+			<td>{{job.totalQuantity}}</td>
+			<td>{{job.quantity}}</td>
 			<td><button @click="delJob(job.id)">刪</button><button @click="setEditUI(job)">改</button></td>
 		</tr>
 	</table>
@@ -25,6 +27,7 @@
 
 	商品說明: <textarea v-model="newJob.jobContent"></textarea><br>
 	商品單價: <textarea v-model="newJob.price"></textarea><br>
+	總庫存: <textarea v-model="newJob.totalQuantity"></textarea><br>
 
 
 	<input type='button' @click="addJob()" value="save">
@@ -40,7 +43,9 @@ const shopApp= Vue.createApp({
 				id: -1,
 				jobName: '',
 				jobContent: '',
-				price: ''
+				price: '',
+                quantity: 0,
+                buyNum: 0
 			}
 		}
 	},
@@ -54,9 +59,13 @@ const shopApp= Vue.createApp({
 			.then(function(myJson) {
 				//we are inside the callback function, now `this` means the function, not vm6
 				//we will use `that` to access vm6
-
+                
 				that.dat = myJson;
 				//todoApp.dat = myJson;
+                for (let i = 0; i < that.dat.length; i++) {
+                    that.dat[i].quantity = that.dat[i].totalQuantity - that.dat[i].buyNum;
+                }
+                console.log(that.dat);
 			});
 		},
 		delJob: function (id) {
@@ -97,7 +106,9 @@ const shopApp= Vue.createApp({
 				id: -1,
 				jobName: '',
 				jobContent: '',
-				price: ''
+				price: '',
+                quantity:0,
+                buyNum: 0
 			};
 			this.setUI('editForm');
 		},
