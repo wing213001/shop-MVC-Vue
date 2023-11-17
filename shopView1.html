@@ -22,14 +22,12 @@
 		</tr>
 	</table>
 </div>
-<div v-if="UI=='editForm'"> <!--畫面-->
+<!--當 UI 變數的值為 'editForm' 時，會顯示這個 <div> 的內容-->
+<div v-if="UI=='editForm'"> 
 	商品名稱: <input type="text"  v-model="newJob.jobName"/> <br/>
-
 	商品說明: <textarea v-model="newJob.jobContent"></textarea><br>
 	商品單價: <textarea v-model="newJob.price"></textarea><br>
 	總庫存: <textarea v-model="newJob.totalQuantity"></textarea><br>
-
-
 	<input type='button' @click="addJob()" value="save">
 </div>
 </div>
@@ -81,6 +79,8 @@ const shopApp= Vue.createApp({
 			})
 		},
 		addJob: function () {
+		    //建立了一個新的 FormData 物件，把dat"的資料
+			//dat（使用 JSON.stringify 轉換了 this.newJob 物件）append進mydat中。
 			const that=this;
 			let mydat = new FormData();
 			mydat.append( "dat", JSON.stringify(this.newJob) );
@@ -89,11 +89,12 @@ const shopApp= Vue.createApp({
 			fetch(url,{
 				method: 'POST',
 				body: mydat // 將表單物件放入fetch的body屬性
-			})
+			}) 
 			.then(function(res){return res.text(); }) //取得傳回值，轉為文字
 			.then(function(data){ 
 				console.log(data);
 				that.setUI('main');
+				//51行
 				that.loadList();
 			})
 		},
@@ -101,6 +102,7 @@ const shopApp= Vue.createApp({
 			this.newJob=job;
 			this.setUI('editForm');
 		},
+		//用vue的模板，初始化設定一個叫newJob的物件，下面是他的預設值或空值
 		setAddUI: function() {
 			this.newJob={
 				id: -1,
@@ -110,6 +112,7 @@ const shopApp= Vue.createApp({
                 quantity:0,
                 buyNum: 0
 			};
+			//按新增商品的話，畫面就會連到 editform(26行)
 			this.setUI('editForm');
 		},
 		setUI: function(page) {
