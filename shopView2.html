@@ -6,6 +6,8 @@
 <body >
 <hr />
 <div id="main">
+
+<!-- customer style-->
 <div id="list" v-if="UI=='main'">
 	<h1>客戶頁面(商品一覽)</h1>
     <button @click="loadList2()">查看購物車</button>
@@ -21,6 +23,9 @@
 		</tr>
 	</table>
 </div>
+
+
+<!-- shopcar style-->
 <div id="list" v-if="UI=='shoppingCar'">
 	<h1>客戶頁面(購物車)</h1>
     <button @click="loadList()">回去商品一覽</button>
@@ -39,6 +44,9 @@
 	</table>
     <td>全品項總價:</td><td>{{sumNum}}</td>
 </div>
+
+
+<!-- shoping style and the viewing-->
 <div v-if="UI=='editForm'">
 	商品名稱: <td>{{newJob.jobName}}</td><br>
 
@@ -50,12 +58,18 @@
 
 	<input type='button' @click="addJob2()" value="save">
 </div>
+
+<!-- the erroe view about the customer overbuying-->
 <div v-if="UI=='error'">
 	<h1>無法購買</h1>
 
 	<input type='button' @click="loadList()" value="返回">
 </div>
 </div>
+
+
+
+<!-- the code background-->
 <script>
 const shopApp= Vue.createApp({
 	data() {
@@ -73,14 +87,14 @@ const shopApp= Vue.createApp({
 		}
 	},
 	methods: {
-		checkBuy: function(dat,i) {
+		checkBuy: function(dat,i) {//check the customer is overbuying or not /also means the storage is enoght for the customer order
 			if (parseInt(dat[i].totalQuantity) < parseInt(dat[i].buyNum)) {
-                return false;
-            } else {
+                return false; //not enough
+            } else {//enough
                 return true;
             }
 		},
-		loadList: function () {
+		loadList: function () {//load the list for web (customer)
 			const that=this; //this  ==> stands for vm6. let's save `this` to `that`
 			fetch('shopControl.php?act=listJob')
 			.then(function(response) {
@@ -102,7 +116,9 @@ const shopApp= Vue.createApp({
 			});
 
 		},
-		loadList2: function () {
+
+
+		loadList2: function () {//load the list of buying list in the shop car
 			const that=this; //this  ==> stands for vm6. let's save `this` to `that`
 			fetch('shopControl.php?act=listJob2')
 			.then(function(response) {
@@ -124,6 +140,9 @@ const shopApp= Vue.createApp({
 			});
 
 		},
+
+
+		//delete the things to buy just make the order amount to zero
 		delJob: function (id) {
 			const that=this;
 			let url="shopControl.php?act=delJob2&id="+id;
@@ -136,6 +155,8 @@ const shopApp= Vue.createApp({
 				that.loadList2();
 			})
 		},
+
+		//add the thing to shop car
 		addJob: function () {
 			const that=this;
 			let mydat = new FormData();
@@ -153,6 +174,8 @@ const shopApp= Vue.createApp({
 				that.loadList();
 			})
 		},
+
+		//
 		addJob2: function () {
 			const that=this;
 			let mydat = new FormData();
@@ -180,10 +203,12 @@ const shopApp= Vue.createApp({
             }
 
 		},
+		//edit ui functions
 		setEditUI: function(job) {
 			this.newJob=job;
 			this.setUI('editForm');
 		},
+		//add ui functions
 		setAddUI: function() {
 			this.newJob={
 				id: -1,
@@ -194,6 +219,7 @@ const shopApp= Vue.createApp({
 			};
 			this.setUI('editForm');
 		},
+		//for set  page function
 		setUI: function(page) {
 			this.UI=page;
 		}
