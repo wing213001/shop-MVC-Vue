@@ -11,13 +11,16 @@ case "listJob2":
   $jobs=getJobList2();
   echo json_encode($jobs);
   return;
+  
 case "addJob":
-	
-	$jsonStr = $_POST['dat'];
-	$job = json_decode($jsonStr);
-	//should verify first
+    //擷取了 POST 資料中名為 "dat" 的資料轉成JSON字串
+	$jsonStr = $_POST['dat']; 
+	//將 JSON 字串轉換成對應 PHP 物件的函式
+	$job = json_decode($jsonStr); 
+	//should verify first 
 	addJob($job->jobName,$job->jobContent,$job->price,$job->buyNum,$job->id,$job->totalQuantity);
-	return;
+	return; 
+	
 case "addJob2":
 	
 	$jsonStr = $_POST['dat'];

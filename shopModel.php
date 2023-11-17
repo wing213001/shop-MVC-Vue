@@ -3,8 +3,10 @@ require('dbconfig.php');
 
 function getJobList() {
 	global $db;
+	//把資料庫SHOP的資料load進來
 	$sql = "select * from shop where 1;";
-	$stmt = mysqli_prepare($db, $sql ); //precompile sql指令，建立statement 物件，以便執行SQL
+	//precompile sql指令，建立statement 物件，以便執行SQL
+	$stmt = mysqli_prepare($db, $sql ); 
 	mysqli_stmt_execute($stmt); //執行SQL
 	$result = mysqli_stmt_get_result($stmt); //取得查詢結果
 
@@ -34,11 +36,12 @@ function getJobList2() { //客戶的購物車
 
 function addJob($jobName,$jobContent,$price,$buyNum,$jobID,$totalQuantity) {
 	global $db;
-	if($jobID>0) {
+	
+	if($jobID>0) { //更新
 		$sql = "update shop set jobName=?, jobContent=?, price=?, buyNum=?, totalQuantity=? where id=?"; //SQL中的 ? 代表未來要用變數綁定進去的地方
 		$stmt = mysqli_prepare($db, $sql); //prepare sql statement
 		mysqli_stmt_bind_param($stmt, "ssiiii", $jobName, $jobContent,$price,$buyNum,$totalQuantity,$jobID); //bind parameters with variables, with types "sss":string, string ,string
-	} else {
+	} else {      // 新增
 		$sql = "insert into shop (jobName, jobContent, price, totalQuantity) values (?, ?, ?, ?)"; //SQL中的 ? 代表未來要用變數綁定進去的地方
 		$stmt = mysqli_prepare($db, $sql); //prepare sql statement
 		mysqli_stmt_bind_param($stmt, "ssii", $jobName, $jobContent,$price,$totalQuantity); //bind parameters with variables, with types "sss":string, string ,string
@@ -65,7 +68,7 @@ function updateJob($id, $jobName,$jobContent,$price) {
 function delJob($id) {
 	global $db;
 
-	$sql = "delete from shop where id=?;"; //SQL中的 ? 代表未來要用變數綁定進去的地方
+	$sql = "delete from shop where id=?;"; //SQL中的?代表未來要用變數綁定進去的地方 
 	$stmt = mysqli_prepare($db, $sql); //prepare sql statement
 	mysqli_stmt_bind_param($stmt, "i", $id); //bind parameters with variables, with types "sss":string, string ,string
 	mysqli_stmt_execute($stmt);  //執行SQL
