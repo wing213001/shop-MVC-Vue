@@ -20,7 +20,7 @@ case "addJob":
 	$jsonStr = $_POST['dat'];
 	$job = json_decode($jsonStr);
 	//should verify first
-	addJob($job->jobName,$job->jobContent,$job->price,$job->buyNum,$job->id,$job->totalQuantity);
+	addJob($job->jobName,$job->jobContent,$job->price,$job->buyNum,$job->id,$job->totalQuantity,$job->username);
 	return;
 
 case "addJob2":
@@ -43,6 +43,17 @@ case "delJob2":
 	//verify
 	delJob2($id);
 	return;
+
+case "sign2":
+	$jsonStr = $_POST['dat'];
+	$id = json_decode($jsonStr);
+	//should verify first
+	sign2($id->name,$id->pwd);
+	return;
+
+	
+	
+	
 default:
   
 }

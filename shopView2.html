@@ -1,6 +1,6 @@
 <html><head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<script type="text/javascript" src="https://unpkg.com/vue@next"></script>
+<script type="text/javascript" src="https://unpkg.com/vue@3.4.5/dist/vue.global.js"></script>
 </head>
 
 <body >
@@ -12,13 +12,14 @@
 	<h1>客戶頁面(商品一覽)</h1>
     <button @click="loadList2()">查看購物車</button>
 	<table border=1>
-		<tr><td>序號</td><td>商品名稱</td><td>商品說明</td><td>商品單價</td><td>剩餘數量</td><td>-</td></tr>
+		<tr><td>序號</td><td>商品名稱</td><td>商品說明</td><td>商品單價</td><td>剩餘數量</td><td>販售賣家</td><td>-</td></tr>
 		<tr v-for="job in dat">
 			<td>{{job.id}}</td>
 			<td>{{job.jobName}}</td>
 			<td>{{job.jobContent}}</td>
 			<td>{{job.price}}</td>
 			<td>{{job.quantity}}</td>
+			<td>{{job.username}}</td>
 			<td><button @click="setEditUI(job)">加入購物車</button></td>
 		</tr>
 	</table>
@@ -30,7 +31,7 @@
 	<h1>客戶頁面(購物車)</h1>
     <button @click="loadList()">回去商品一覽</button>
 	<table border=1>
-		<tr><td>序號</td><td>商品名稱</td><td>商品說明</td><td>商品單價</td><td>購買數量</td><td>單項總價</td><td>剩餘數量</td><td>-</td></tr>
+		<tr><td>序號</td><td>商品名稱</td><td>商品說明</td><td>商品單價</td><td>購買數量</td><td>單項總價</td><td>剩餘數量</td><td>販售賣家</td><td>-</td></tr>
 		<tr v-for="job in dat">
 			<td>{{job.id}}</td>
 			<td>{{job.jobName}}</td>
@@ -38,7 +39,8 @@
 			<td>{{job.price}}</td>
 			<td>{{job.buyNum}}</td>
 			<td>{{job.result}}</td>
-			<td>{{job.quantity}}</td>
+			<td>{{job.username}}</td>
+			
 			<td><button @click="delJob(job.id)">刪除商品</button><button @click="setEditUI(job)">修改數量</button></td>
 		</tr>
 	</table>
