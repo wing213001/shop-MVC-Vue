@@ -1,14 +1,130 @@
 <html><head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<script type="text/javascript" src="https://unpkg.com/vue@next"></script>
+<script type="text/javascript" src="https://unpkg.com/vue@3.4.5/dist/vue.global.js"></script>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/js-cookie@3.0.5/dist/js.cookie.min.js"></script>
 </head>
 
 <body >
-<hr />
 <div id="main">
-<div id="list" v-if="UI=='main'">
+<div id="list" v-if="UI=='buyPage'">
+	<h1>客戶頁面(商品一覽)</h1>
+    <button @click="loadList2()">查看購物車</button><button @click="loadList4()">查看歷史訂單</button><button @click="loadList6()">查看已寄送的訂單</button>
+	<table border=1>
+		<tr><td>序號</td><td>商品名稱</td><td>商品說明</td><td>商品單價</td><td>剩餘數量</td><td>商家</td><td>-</td></tr>
+		<tr v-for="job in dat">
+			<td>{{job.id}}</td>
+			<td>{{job.jobName}}</td>
+			<td>{{job.jobContent}}</td>
+			<td>{{job.price}}</td>
+			<td>{{job.quantity}}</td>
+			<td>{{job.sellerID}}</td>
+			<td><button @click="setEditUI2(job)">加入購物車</button></td>
+		</tr>
+	</table>
+    <button @click="logout()">登出</button>
+</div>
+<div id="list" v-if="UI=='shoppingCar'">
+	<h1>客戶頁面(購物車)</h1>
+    <button @click="loadListC()">回去商品一覽</button><button @click="loadList4()">查看歷史訂單</button>
+	<table border=1>
+		<tr><td>訂單編號</td><td>商品名稱</td><td>商品單價</td><td>購買數量</td><td>單項總價</td><td>-</td></tr>
+		<tr v-for="job in dat">
+            <td>{{job.orderID}}</td>
+			<td>{{job.jobName}}</td>
+			<td>{{job.price}}</td>
+			<td>{{job.buyNum}}</td>
+			<td>{{job.result}}</td>
+			<td><button @click="delJob2(job.orderID,job.jobName,job.sellerID,job.buyNum)">刪除商品</button>
+		</tr>
+	</table>
+    <td>全品項總價:</td><td>{{sumNum}}</td><button @click="checkout()">結帳送出訂單</button>
+</div>
+
+<div id="list" v-if="UI=='buyOrder'">
+	<h1>客戶頁面(確認訂單)</h1>
+    <button @click="loadListC()">回去商品一覽</button>
+	<table border=1>
+		<tr><td>訂單編號</td><td>商品名稱</td><td>商品單價</td><td>購買數量</td><td>單項總價</td><td>訂單狀態</td><td>滿意度</td></tr>
+		<tr v-for="job in dat">
+            <td>{{job.orderID}}</td>
+			<td>{{job.jobName}}</td>
+			<td>{{job.price}}</td>
+			<td>{{job.buyNum}}</td>
+			<td>{{job.result}}</td>
+			<td>{{job.status}}</td>
+			<td>{{job.satisfaction}}</td>
+		</tr>
+	</table>
+</div>
+
+<div id="list" v-if="UI=='pickUpPage'">
+	<h1>客戶頁面(取貨)</h1>
+    <button @click="loadListC()">回去商品一覽</button>
+	<table border=1>
+		<tr><td>訂單編號</td><td>商品名稱</td><td>商品單價</td><td>購買數量</td><td>單項總價</td><td>訂單狀態</td><td>-</td></tr>
+		<tr v-for="job in dat">
+            <td>{{job.orderID}}</td>
+			<td>{{job.jobName}}</td>
+			<td>{{job.price}}</td>
+			<td>{{job.buyNum}}</td>
+			<td>{{job.result}}</td>
+			<td>{{job.status}}</td>
+            <td><button @click="setPickUpUI(job)">取貨</button>
+		</tr>
+	</table>
+</div>
+
+<div v-if="UI=='editForm2'">
+	商品名稱: <td>{{newJob.jobName}}</td><br>
+
+	商品說明: <td>{{newJob.jobContent}}</td><br>
+	商品單價: <td>{{newJob.price}}</td><br>
+	剩餘數量: <td>{{newJob.quantity}}</td><br>
+	購買數量: <textarea v-model="newJob.NewBuyNum"></textarea><br>
+    
+
+	<input type='button' @click="addJob2()" value="save">
+</div>
+
+<div v-if="UI=='pickUpForm'">
+	商品名稱: <td>{{newJob.jobName}}</td><br>
+	商品總額: <td>{{newJob.result}}</td><br>
+	購買數量: <td>{{newJob.buyNum}}</td><br>
+    滿意度: <select v-model="newJob.howGood">
+<option value="1">1</option>
+<option value="2">2</option>
+<option value="3">3</option>
+<option value="4">4</option>
+<option value="5">5</option>
+</select>
+
+	<input type='button' @click="pickUpOrder()" value="save">
+</div>
+
+<div v-if="UI=='error'">
+	<h1>無法購買</h1>
+
+	<input type='button' @click="loadListC()" value="返回">
+</div>
+<div v-if="UI=='loginForm'">
+	用戶名稱: <input type="text"  v-model="name"/> <br/>
+	密碼: <input type="text" v-model="pwd" />
+	<input type='button' @click="login()" value="login"><br/>
+    <button @click="setSignUI()">註冊帳號</button>
+</div>
+<div v-if="UI=='signUpForm'">
+	用戶名稱: <input type="text"  v-model="name"/> <br/>
+	密碼: <input type="text" v-model="pwd" /> <br/>
+    帳號角色: <select v-model="role">
+<option value="1" selected>商家</option>
+<option value="2">客戶</option>
+<option value="3">物流</option>
+</select>
+	<input type='button' @click="signUp()" value="註冊">
+</div>
+<div id="list" v-if="UI=='sellPage'">
 	<h1>商家頁面</h1>
-	<button @click="setAddUI()">新增商品</button>
+	<button @click="setAddUI()">新增商品</button><button @click="loadList3()">收到的訂單</button><button @click="loadList7()">查看已送達的訂單</button>
 	<table border=1>
 		<tr><td>序號</td><td>商品名稱</td><td>商品說明</td><td>商品單價</td><td>總庫存</td><td>剩餘數量</td><td>-</td></tr>
 		<tr v-for="job in dat">
@@ -21,6 +137,38 @@
 			<td><button @click="delJob(job.id)">刪</button><button @click="setEditUI(job)">改</button></td>
 		</tr>
 	</table>
+    <button @click="logout()">登出</button>
+</div>
+<div id="list" v-if="UI=='orderCheck'">
+	<h1>商家頁面(收到的訂單)</h1>
+    <button @click="loadList()">返回商品一覽</button>
+	<table border=1>
+		<tr><td>訂單編號</td><td>商品名稱</td><td>商品單價</td><td>購買數量</td><td>單項總價</td><td>訂單狀態</td><td>-</td></tr>
+		<tr v-for="job in dat">
+			<td>{{job.orderID}}</td>
+			<td>{{job.jobName}}</td>
+			<td>{{job.price}}</td>
+			<td>{{job.buyNum}}</td>
+			<td>{{job.result}}</td>
+			<td>{{job.status}}</td>
+			<td><button @click="orderReceived(job.orderID)">確認訂單並出貨</button>
+		</tr>
+	</table>
+    <button @click="logout()">登出</button>
+</div>
+<div id="list" v-if="UI=='rating'">
+	<h1>商家頁面(查看評價)</h1>
+	<button @click="loadList()">返回商品一覽</button><button @click="loadList3()">收到的訂單</button>
+	<table border=1>
+		<tr><td>序號</td><td>商品名稱</td><td>訂單價格</td><td>顧客評價</td></tr>
+		<tr v-for="job in dat">
+			<td>{{job.orderID}}</td>
+			<td>{{job.jobName}}</td>
+			<td>{{job.result}}</td>
+			<td>{{job.satisfaction}}</td>
+		</tr>
+	</table>
+    <button @click="logout()">登出</button>
 </div>
 <div v-if="UI=='editForm'">
 	商品名稱: <input type="text"  v-model="newJob.jobName"/> <br/>
@@ -32,27 +180,65 @@
 
 	<input type='button' @click="addJob()" value="save">
 </div>
+<div id="list" v-if="UI=='transport'">
+	<h1>物流頁面(首頁)</h1>
+    <button @click="loadList5()">查看已寄送訂單狀況</button>
+	<table border=1>
+		<tr><td>訂單編號</td><td>商品名稱</td><td>商品單價</td><td>購買數量</td><td>單項總價</td><td>訂單狀態</td><td>-</td></tr>
+		<tr v-for="job in dat">
+			<td>{{job.orderID}}</td>
+			<td>{{job.jobName}}</td>
+			<td>{{job.price}}</td>
+			<td>{{job.buyNum}}</td>
+			<td>{{job.result}}</td>
+			<td>{{job.status}}</td>
+			<td><button @click="deliver(job.orderID)">確認貨物並寄送</button>
+		</tr>
+	</table>
+    <button @click="logout()">登出</button>
+</div>
+<div id="list" v-if="UI=='delivered'">
+	<h1>物流頁面(已寄出的訂單)</h1>
+    <button @click="loadListT()">回去首頁</button>
+	<table border=1>
+		<tr><td>訂單編號</td><td>商品名稱</td><td>商品單價</td><td>購買數量</td><td>單項總價</td><td>訂單狀態</td></tr>
+		<tr v-for="job in dat">
+			<td>{{job.orderID}}</td>
+			<td>{{job.jobName}}</td>
+			<td>{{job.price}}</td>
+			<td>{{job.buyNum}}</td>
+			<td>{{job.result}}</td>
+			<td>{{job.status}}</td>
+		</tr>
+	</table>
+    <button @click="logout()">登出</button>
+</div>
 </div>
 <script>
 const shopApp= Vue.createApp({
 	data() {
 		return {
-			UI: 'main',
+			UI: '',
 			dat: [],
 			newJob: {
 				id: -1,
 				jobName: '',
 				jobContent: '',
 				price: '',
-                quantity: 0,
-                buyNum: 0
-			}
+                quantity: 0
+			},
+			name: '',
+			pwd: '',
+            userID: '',
+            role: '',
+            sumNum: 0,
 		}
 	},
 	methods: {
 		loadList: function () {
 			const that=this; //this  ==> stands for vm6. let's save `this` to `that`
-			fetch('shopControl.php?act=listJob')
+			const CookieUser = Cookies.get('loginUser');
+            fetch('shopControl.php?act=listJob&userID='+CookieUser)
 			.then(function(response) {
 				return response.json();
 			})
@@ -65,7 +251,37 @@ const shopApp= Vue.createApp({
                 for (let i = 0; i < that.dat.length; i++) {
                     that.dat[i].quantity = that.dat[i].totalQuantity - that.dat[i].buyNum;
                 }
-                console.log(that.dat);
+                that.setUI('sellPage');
+			});
+		},
+		loadList3: function () { //列出商家要確認的訂單
+			const that=this; //this  ==> stands for vm6. let's save `this` to `that`
+            const CookieUser = Cookies.get('loginUser');
+			fetch('shopControl.php?act=listJob3&userID='+CookieUser)
+			.then(function(response) {
+				return response.json();
+			})
+			.then(function(myJson) {
+				//we are inside the callback function, now `this` means the function, not vm6
+				//we will use `that` to access vm6
+				that.dat = myJson;
+				//todoApp.dat = myJson;
+                that.setUI('orderCheck');
+			});
+		},
+		loadList7: function () { //列出客戶已取貨的訂單
+			const that=this; //this  ==> stands for vm6. let's save `this` to `that`
+            const CookieUser = Cookies.get('loginUser');
+			fetch('shopControl.php?act=listJob7&userID='+CookieUser)
+			.then(function(response) {
+				return response.json();
+			})
+			.then(function(myJson) {
+				//we are inside the callback function, now `this` means the function, not vm6
+				//we will use `that` to access vm6
+				that.dat = myJson;
+				//todoApp.dat = myJson;
+                that.setUI('rating');
 			});
 		},
 		delJob: function (id) {
@@ -82,10 +298,11 @@ const shopApp= Vue.createApp({
 		},
 		addJob: function () {
 			const that=this;
+            const CookieUser = Cookies.get('loginUser');
 			let mydat = new FormData();
 			mydat.append( "dat", JSON.stringify(this.newJob) );
 
-			let url="shopControl.php?act=addJob";
+			let url="shopControl.php?act=addJob&userID="+CookieUser;
 			fetch(url,{
 				method: 'POST',
 				body: mydat // 將表單物件放入fetch的body屬性
@@ -93,8 +310,20 @@ const shopApp= Vue.createApp({
 			.then(function(res){return res.text(); }) //取得傳回值，轉為文字
 			.then(function(data){ 
 				console.log(data);
-				that.setUI('main');
+				that.setUI('sellPage');
 				that.loadList();
+			})
+		},
+		orderReceived: function (orderID) {
+			const that=this;
+			let url="shopControl.php?act=orderReceived&orderID="+orderID;
+			fetch(url,{
+				method: 'POST'
+			})
+			.then(function(res){return res.text(); }) //取得傳回值，轉為文字
+			.then(function(data){
+				console.log(data);
+				that.loadList3();
 			})
 		},
 		setEditUI: function(job) {
@@ -114,10 +343,290 @@ const shopApp= Vue.createApp({
 		},
 		setUI: function(page) {
 			this.UI=page;
-		}
+		},
+        logout: function() {
+				const that=this;
+				// you may also use document.getElementById('loginID').value to get that field
+				let url="shopControl.php?act=logout";
+				//url="loginCheck.py";
+				fetch(url,{
+					method: 'POST',
+				})
+				.then(function(res){return res.text(); }) //取得傳回值，轉為文字
+				.then(function(data){
+						that.setUI('loginForm');
+				})
+		},
+		login: function() {
+				const that=this;
+				let mydat = new FormData();
+				mydat.append( "name", this.name);
+				// you may also use document.getElementById('loginID').value to get that field
+				mydat.append( "pwd", this.pwd);
+				let url="shopControl.php?act=login";
+				fetch(url,{
+					method: 'POST',
+					body: mydat // 將表單物件放入fetch的body屬性
+				})
+				.then(function(res){return res.text(); }) //取得傳回值，轉為文字
+				.then(function(data){
+					that.dat = data;
+                    const CookieRole = Cookies.get('loginRole');
+                    console.log(CookieRole);
+                    if (CookieRole == '1') {
+                        that.setUI('sellPage');
+                        that.loadList();
+                    } else if (CookieRole == '2'){
+                        that.setUI('buyPage');
+                        that.loadListC();
+                    } else if (CookieRole == '3') {
+                        that.setUI('transport');
+                        that.loadListT();
+                    } else {
+						alert('incorrect name or pwd.');
+					}				
+				})
+		},
+        signUp: function() {
+			const that=this;
+			let mydat = new FormData();
+			mydat.append("name", this.name);
+			mydat.append("pwd", this.pwd);
+			mydat.append("role", this.role);
+
+			let url="shopControl.php?act=signUp";
+			fetch(url,{
+				method: 'POST',
+				body: mydat // 將表單物件放入fetch的body屬性
+			})
+			.then(function(res){return res.text(); }) //取得傳回值，轉為文字
+			.then(function(data){ 
+				that.setUI('loginForm');
+			})
+        },
+        setSignUI: function() {
+            this.setUI('signUpForm');
+        },
+		checkBuy: function(dat,i) {
+			if (parseInt(dat[i].totalQuantity) - parseInt(dat[i].buyNum) < parseInt(dat[i].NewBuyNum) || parseInt(dat[i].NewBuyNum) <= 0) {
+                return false;
+            } else {
+                return true;
+            }
+		},
+		loadListC: function () {
+			const that=this; //this  ==> stands for vm6. let's save `this` to `that`
+			fetch('shopControl.php?act=listJobC')
+			.then(function(response) {
+				return response.json();
+			})
+			.then(function(myJson) {
+				//we are inside the callback function, now `this` means the function, not vm6
+				//we will use `that` to access vm6
+				that.dat = myJson;
+				//todoApp.dat = myJson;
+   //             that.sumNum = 0;
+  //              for (let i = 0; i < that.dat.length; i++) {
+   //                 that.sumNum += that.dat[i].result;
+    //            }
+                for (let i = 0; i < that.dat.length; i++) {
+                    that.dat[i].quantity = that.dat[i].totalQuantity - that.dat[i].buyNum;
+                }
+                that.setUI('buyPage');
+			});
+
+		},
+		loadList2: function () {
+			const that=this; //this  ==> stands for vm6. let's save `this` to `that`
+            const CookieUser = Cookies.get('loginUser');
+			fetch('shopControl.php?act=listJob2&userID='+CookieUser)
+			.then(function(response) {
+				return response.json();
+			})
+			.then(function(myJson) {
+				//we are inside the callback function, now `this` means the function, not vm6
+				//we will use `that` to access vm6
+				that.dat = myJson;
+				//todoApp.dat = myJson;
+                that.sumNum = 0;
+                for (let i = 0; i < that.dat.length; i++) {
+                    that.sumNum += that.dat[i].result;
+                }
+                that.setUI('shoppingCar');
+			});
+
+		},
+		loadList4: function () {
+			const that=this; //this  ==> stands for vm6. let's save `this` to `that`
+            const CookieUser = Cookies.get('loginUser');
+			fetch('shopControl.php?act=listJob4&userID='+CookieUser)
+			.then(function(response) {
+				return response.json();
+			})
+			.then(function(myJson) {
+				//we are inside the callback function, now `this` means the function, not vm6
+				//we will use `that` to access vm6
+				that.dat = myJson;
+				//todoApp.dat = myJson;
+                that.sumNum = 0;
+                for (let i = 0; i < that.dat.length; i++) {
+                    that.sumNum += that.dat[i].result;
+                }
+                that.setUI('buyOrder');
+			});
+		},
+		loadList6: function () { //列出已寄送的訂單
+			const that=this; //this  ==> stands for vm6. let's save `this` to `that`
+            const CookieUser = Cookies.get('loginUser');
+			fetch('shopControl.php?act=listJob6&userID='+CookieUser)
+			.then(function(response) {
+				return response.json();
+			})
+			.then(function(myJson) {
+				//we are inside the callback function, now `this` means the function, not vm6
+				//we will use `that` to access vm6
+				that.dat = myJson;
+				//todoApp.dat = myJson;
+                that.setUI('pickUpPage');
+			});
+
+		},
+		delJob2: function (orderID,jobName,sellerID,buyNum) {
+			const that=this;
+			let url="shopControl.php?act=delJob2&orderID="+orderID+"&jobName="+jobName+"&sellerID="+sellerID+"&buyNum="+buyNum;
+			fetch(url,{
+				method: 'POST'
+			})
+			.then(function(res){return res.text(); }) //取得傳回值，轉為文字
+			.then(function(data){
+				console.log(data);
+				that.loadList2();
+			})
+		},
+		addJob2: function () {
+			const that=this;
+			let mydat = new FormData();
+			mydat.append( "dat", JSON.stringify(this.newJob) );
+            let check = true;
+            for (let i = 0; i < this.dat.length; i++) {
+                if (!this.checkBuy(this.dat,i)) {
+                    check = false;
+                }
+            }
+            if (check) {
+                const CookieUser = Cookies.get('loginUser');
+                let url="shopControl.php?act=addJob2&userID="+CookieUser;
+                fetch(url,{
+                    method: 'POST',
+                    body: mydat // 將表單物件放入fetch的body屬性
+                })
+                .then(function(res){return res.text(); }) //取得傳回值，轉為文字
+                .then(function(data){ 
+                    that.dat = data;
+                    that.totalBuyNum += data.buyNum;
+                    that.setUI('shoppingCar');
+                    that.loadList2();
+                })
+            } else {
+                this.setUI('error');
+            }
+
+		},
+		pickUpOrder: function () {
+			const that=this;
+			let mydat = new FormData();
+			mydat.append( "dat", JSON.stringify(this.newJob) );
+			let url="shopControl.php?act=pickUp";
+			fetch(url,{
+				method: 'POST',
+                body: mydat
+			})
+			.then(function(res){return res.text(); }) //取得傳回值，轉為文字
+			.then(function(data){
+				console.log(data);
+				that.loadList6();
+			})
+		},
+		setEditUI2: function(job) {
+			this.newJob=job;
+			this.setUI('editForm2');
+		},
+		setPickUpUI: function(job) {
+			this.newJob=job;
+			this.setUI('pickUpForm');
+		},
+		loadListT: function () { //列出物流要送的訂單
+			const that=this; //this  ==> stands for vm6. let's save `this` to `that`
+			fetch('shopControl.php?act=listJobT')
+			.then(function(response) {
+				return response.json();
+			})
+			.then(function(myJson) {
+				//we are inside the callback function, now `this` means the function, not vm6
+				//we will use `that` to access vm6
+				that.dat = myJson;
+				//todoApp.dat = myJson;
+                that.setUI('transport');
+			});
+
+		},
+		loadList5: function () { //列出已寄送的訂單狀況
+			const that=this; //this  ==> stands for vm6. let's save `this` to `that`
+			fetch('shopControl.php?act=listJob5')
+			.then(function(response) {
+				return response.json();
+			})
+			.then(function(myJson) {
+				//we are inside the callback function, now `this` means the function, not vm6
+				//we will use `that` to access vm6
+				that.dat = myJson;
+				//todoApp.dat = myJson;
+                that.setUI('delivered');
+			});
+
+		},
+		deliver: function (orderID) {
+			const that=this;
+			let url="shopControl.php?act=deliver&orderID="+orderID;
+			fetch(url,{
+				method: 'POST'
+			})
+			.then(function(res){return res.text(); }) //取得傳回值，轉為文字
+			.then(function(data){
+				console.log(data);
+				that.loadListT();
+			})
+		},
+        checkout: function () {
+			const that=this;
+            const CookieUser = Cookies.get('loginUser');
+			let url="shopControl.php?act=checkout&userID="+CookieUser;
+			fetch(url,{
+				method: 'POST',
+			})
+			.then(function(res){return res.text(); }) //取得傳回值，轉為文字
+			.then(function(data){
+				that.loadList2();
+			})
+		},
 	},
-	created() {
-		this.loadList();
+	created() {		
+        const CookieRole = Cookies.get('loginRole');
+        console.log(CookieRole);
+        const CookieUser = Cookies.get('loginUser');
+        console.log(CookieUser);
+        if (CookieRole == '1') {
+			this.setUI('sellPage');
+            this.loadList(); 
+		} else if (CookieRole == '2'){
+			this.setUI('buyPage');
+            this.loadListC();
+		} else if (CookieRole == '3') {
+            this.setUI('transport');
+            this.loadListT();
+        } else {
+            this.setUI('loginForm');
+        }
 	}
 }).mount("#main");
 </script>

@@ -2,11 +2,10 @@
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <script type="text/javascript" src="https://unpkg.com/vue@next"></script>
 </head>
-
 <body >
 <hr />
 <div id="main">
-<div id="list" v-if="UI=='main'">
+<div id="list" v-if="UI=='buyPage'">
 	<h1>客戶頁面(商品一覽)</h1>
     <button @click="loadList2()">查看購物車</button>
 	<table border=1>
@@ -17,13 +16,13 @@
 			<td>{{job.jobContent}}</td>
 			<td>{{job.price}}</td>
 			<td>{{job.quantity}}</td>
-			<td><button @click="setEditUI(job)">加入購物車</button></td>
+			<td><button @click="setEditUI2(job)">加入購物車</button></td>
 		</tr>
 	</table>
 </div>
 <div id="list" v-if="UI=='shoppingCar'">
 	<h1>客戶頁面(購物車)</h1>
-    <button @click="loadList()">回去商品一覽</button>
+    <button @click="loadListC()">回去商品一覽</button>
 	<table border=1>
 		<tr><td>序號</td><td>商品名稱</td><td>商品說明</td><td>商品單價</td><td>購買數量</td><td>單項總價</td><td>剩餘數量</td><td>-</td></tr>
 		<tr v-for="job in dat">
@@ -34,12 +33,12 @@
 			<td>{{job.buyNum}}</td>
 			<td>{{job.result}}</td>
 			<td>{{job.quantity}}</td>
-			<td><button @click="delJob(job.id)">刪除商品</button><button @click="setEditUI(job)">修改數量</button></td>
+			<td><button @click="delJob2(job.id)">刪除商品</button><button @click="setEditUI2(job)">修改數量</button></td>
 		</tr>
 	</table>
     <td>全品項總價:</td><td>{{sumNum}}</td>
 </div>
-<div v-if="UI=='editForm'">
+<div v-if="UI=='editForm2'">
 	商品名稱: <td>{{newJob.jobName}}</td><br>
 
 	商品說明: <td>{{newJob.jobContent}}</td><br>
@@ -53,14 +52,14 @@
 <div v-if="UI=='error'">
 	<h1>無法購買</h1>
 
-	<input type='button' @click="loadList()" value="返回">
+	<input type='button' @click="loadListC()" value="返回">
 </div>
 </div>
 <script>
 const shopApp= Vue.createApp({
 	data() {
 		return {
-			UI: 'main',
+			UI: 'buyPage',
 			dat: [],
 			newJob: {
 				id: -1,
@@ -80,7 +79,7 @@ const shopApp= Vue.createApp({
                 return true;
             }
 		},
-		loadList: function () {
+		loadListC: function () {
 			const that=this; //this  ==> stands for vm6. let's save `this` to `that`
 			fetch('shopControl.php?act=listJob')
 			.then(function(response) {
@@ -91,14 +90,14 @@ const shopApp= Vue.createApp({
 				//we will use `that` to access vm6
 				that.dat = myJson;
 				//todoApp.dat = myJson;
-                that.sumNum = 0;
-                for (let i = 0; i < that.dat.length; i++) {
-                    that.sumNum += that.dat[i].result;
-                }
+   //             that.sumNum = 0;
+  //              for (let i = 0; i < that.dat.length; i++) {
+   //                 that.sumNum += that.dat[i].result;
+    //            }
                 for (let i = 0; i < that.dat.length; i++) {
                     that.dat[i].quantity = that.dat[i].totalQuantity - that.dat[i].buyNum;
                 }
-                that.setUI('main');
+                that.setUI('buyPage');
 			});
 
 		},
@@ -124,7 +123,7 @@ const shopApp= Vue.createApp({
 			});
 
 		},
-		delJob: function (id) {
+		delJob2: function (id) {
 			const that=this;
 			let url="shopControl.php?act=delJob2&id="+id;
 			fetch(url,{
@@ -134,23 +133,6 @@ const shopApp= Vue.createApp({
 			.then(function(data){
 				console.log(data);
 				that.loadList2();
-			})
-		},
-		addJob: function () {
-			const that=this;
-			let mydat = new FormData();
-			mydat.append( "dat", JSON.stringify(this.newJob) );
-
-			let url="shopControl.php?act=addJob";
-			fetch(url,{
-				method: 'POST',
-				body: mydat // 將表單物件放入fetch的body屬性
-			})
-			.then(function(res){return res.text(); }) //取得傳回值，轉為文字
-			.then(function(data){ 
-				console.log(data);
-				that.setUI('main');
-				that.loadList();
 			})
 		},
 		addJob2: function () {
@@ -180,26 +162,16 @@ const shopApp= Vue.createApp({
             }
 
 		},
-		setEditUI: function(job) {
+		setEditUI2: function(job) {
 			this.newJob=job;
-			this.setUI('editForm');
-		},
-		setAddUI: function() {
-			this.newJob={
-				id: -1,
-				jobName: '',
-				jobContent: '',
-				price: '',
-                quantity: 0
-			};
-			this.setUI('editForm');
+			this.setUI('editForm2');
 		},
 		setUI: function(page) {
 			this.UI=page;
 		}
 	},
 	created() {
-		this.loadList();
+		this.loadListC();
 	}
 }).mount("#main");
 </script>

@@ -1,0 +1,121 @@
+<html><head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<script type="text/javascript" src="https://unpkg.com/vue@next"></script>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/js-cookie@3.0.5/dist/js.cookie.min.js"></script>
+</head>
+
+<body >
+<hr />
+<div id="main">
+<div id="list" v-if="UI=='main'">
+	<h1>This is the main page.</h1>
+	<hr/>
+	{{info}}
+    <hr/>
+    <input type='button' @click="logout()" value="logout">
+</div>
+<div v-if="UI=='loginForm'">
+	ID: <input type="text"  v-model="name"/> <br/>
+	Password: <input type="text" v-model="pwd" />
+	<input type='button' @click="login()" value="login"><button @click="setSignUI()">註冊帳號</button>
+</div>
+<div v-if="UI=='signUpForm'">
+	name: <input type="text"  v-model="name"/> <br/>
+	Password: <input type="text" v-model="pwd" />
+    帳號角色: <select v-model="role">
+<option value="1" selected>客戶</option>
+<option value="2">商家</option>
+<option value="3">物流</option>
+</select>
+	<input type='button' @click="signUp()" value="註冊">
+</div>
+</div>
+<script>
+const todoApp= Vue.createApp({
+	data() {
+		return {
+			
+            UI: '',
+			name: '',
+			pwd: '',
+            userID: '',
+            role: ''
+		}
+	},
+	methods: {
+		logout: function() {
+				const that=this;
+				// you may also use document.getElementById('loginID').value to get that field
+				let url="shopControl.php?act=logout";
+				//url="loginCheck.py";
+				fetch(url,{
+					method: 'POST',
+				})
+				.then(function(res){return res.text(); }) //取得傳回值，轉為文字
+				.then(function(data){
+						that.setUI('loginForm');
+				})
+		},
+		login: function() {
+				const that=this;
+				let mydat = new FormData();
+				mydat.append( "name", this.name);
+				// you may also use document.getElementById('loginID').value to get that field
+				mydat.append( "pwd", this.pwd);
+				let url="shopControl.php?act=login";
+				fetch(url,{
+					method: 'POST',
+					body: mydat // 將表單物件放入fetch的body屬性
+				})
+				.then(function(res){return res.text(); }) //取得傳回值，轉為文字
+				.then(function(data){
+					that.userID = data.userID;
+                    const role = Cookies.get('loginRole');
+                    if (role == '1') {
+                        this.setUI('sellPage');
+                    } else if (role == '2'){
+                        this.setUI('buyPage');
+                    } else if (role == '3') {
+                        this.setUI('transport');
+                    } else {
+						alert('incorrect name or pwd.');
+					}				
+				})
+		},
+        signUp: function() {
+			const that=this;
+			let mydat = new FormData();
+			mydat.append("name", this.name);
+			mydat.append("pwd", this.pwd);
+			mydat.append("role", this.role);
+
+			let url="shopControl.php?act=signUp";
+			fetch(url,{
+				method: 'POST',
+				body: mydat // 將表單物件放入fetch的body屬性
+			})
+			.then(function(res){return res.text(); }) //取得傳回值，轉為文字
+			.then(function(data){ 
+				this.setUI('loginForm');
+			})
+        },
+        setSignUI: function() {
+            this.setUI('signUpForm');
+        }
+	},
+	created() {		
+		const role = Cookies.get('loginRole');
+        if (role == '1') {
+			this.setUI('sellPage');
+            this.loadList();
+		} else if (role == '2'){
+			this.setUI('buyPage');
+		} else if (role == '3') {
+            this.setUI('transport');
+        } else {
+            this.setUI('loginForm');
+        }
+	}
+}).mount("#main");
+</script>
+</body></html>
